@@ -15,14 +15,20 @@ const StreamCreate = (props) => {
       </div>
     );
   };
+
+  const onSubmit = (formValues) => {
+    console.log(formValues);
+  };
+
   return (
-    <form className="ui form">
+    <form onSubmit={props.handleSubmit(onSubmit)} className="ui form">
       <Field name="title" component={renderInput} label="Enter Title" />
       <Field
         name="description"
         component={renderInput}
         label="Enter Description"
       />
+      <button className="ui button primary">Submit</button>
     </form>
   );
 };
