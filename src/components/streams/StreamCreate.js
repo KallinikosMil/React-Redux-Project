@@ -1,5 +1,5 @@
 import React from 'react';
-import { Field, reduxForm } from 'redux-form';
+import { Field, reduxForm, updateSyncErrors } from 'redux-form';
 //Field is supposed to be a react component and thats why it has a capital F
 //a component that we are going to render on the screen
 
@@ -16,11 +16,24 @@ import { Field, reduxForm } from 'redux-form';
 // it will not only be slower, but your input will lose focus
 // whenever the entire form component rerenders.
 //******************************************************
-const renderInput = ({ input, label }) => {
+const renderError = ({ error, touched }) => {
+  console.log(error);
+  console.log(touched);
+  if (touched && error) {
+    return (
+      <div className="ui error message">
+        <div className="header">{error}</div>
+      </div>
+    );
+  }
+};
+const renderInput = ({ input, label, meta }) => {
+  const className = `field ${meta.error && meta.touched ? 'error' : ''}`;
   return (
-    <div className="field">
+    <div className={className}>
       <label>{label}</label>
-      <input {...input} />
+      <input {...input} autoComplete="off" />
+      {renderError(meta)}
     </div>
   );
 };
@@ -30,7 +43,7 @@ const onSubmit = (formValues) => {
 };
 const StreamCreate = (props) => {
   return (
-    <form onSubmit={props.handleSubmit(onSubmit)} className="ui form">
+    <form onSubmit={props.handleSubmit(onSubmit)} className="ui form error">
       <Field name="title" component={renderInput} label="Enter Title" />
       <Field
         name="description"
@@ -42,26 +55,18 @@ const StreamCreate = (props) => {
   );
 };
 
+const validate = (formValues) => {
+  const errors = {};
+  if (!formValues.title) {
+    errors.title = 'You must enter a title';
+  }
+  if (!formValues.description) {
+    errors.description = 'You must enter a description';
+  }
+  return errors;
+};
+
 export default reduxForm({
   form: 'streamCreate',
+  validate,
 })(StreamCreate);
-
-// import React from 'react';
-// import { Field, reduxForm } from 'redux-form';
-// class StreamCreate extends React.Component {
-//   renderInput(formProps) {
-//     return <input {...formProps.input} />;
-//   }
-
-//   render() {
-//     return (
-//       <form>
-//         <Field name="title" component={this.renderInput} />
-//         <Field name="description" component={this.renderInput} />
-//       </form>
-//     );
-//   }
-// }
-// export default reduxForm({
-//   form: 'sreamCreate',
-// })(StreamCreate);
