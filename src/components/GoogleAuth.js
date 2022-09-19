@@ -7,7 +7,6 @@ const GoogleAuth = (props) => {
   const auth = useRef('');
 
   useEffect(() => {
-    console.log('1');
     window.gapi.load('client:auth2', () => {
       window.gapi.client
         .init({

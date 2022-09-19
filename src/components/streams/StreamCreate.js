@@ -1,5 +1,7 @@
 import React from 'react';
-import { Field, reduxForm, updateSyncErrors } from 'redux-form';
+import { connect } from 'react-redux';
+import { Field, reduxForm } from 'redux-form';
+import { createStream } from '../../actions';
 //Field is supposed to be a react component and thats why it has a capital F
 //a component that we are going to render on the screen
 
@@ -17,8 +19,6 @@ import { Field, reduxForm, updateSyncErrors } from 'redux-form';
 // whenever the entire form component rerenders.
 //******************************************************
 const renderError = ({ error, touched }) => {
-  console.log(error);
-  console.log(touched);
   if (touched && error) {
     return (
       <div className="ui error message">
@@ -38,10 +38,11 @@ const renderInput = ({ input, label, meta }) => {
   );
 };
 
-const onSubmit = (formValues) => {
-  console.log(formValues);
-};
 const StreamCreate = (props) => {
+  const onSubmit = (formValues) => {
+    props.createStream(formValues);
+  };
+
   return (
     <form onSubmit={props.handleSubmit(onSubmit)} className="ui form error">
       <Field name="title" component={renderInput} label="Enter Title" />
@@ -66,7 +67,9 @@ const validate = (formValues) => {
   return errors;
 };
 
-export default reduxForm({
+const formWrapped = reduxForm({
   form: 'streamCreate',
   validate,
 })(StreamCreate);
+
+export default connect(null, { createStream })(formWrapped);
