@@ -1,27 +1,50 @@
 import React from 'react';
+import { connect } from 'react-redux';
 import { Field, reduxForm } from 'redux-form';
+import { createStream } from '../../actions';
 //Field is supposed to be a react component and thats why it has a capital F
 //a component that we are going to render on the screen
 
 //reduxForm is a function. it has the same functionality as the connect
 // function that we use with React Redux! (lecture 327)
 
-const StreamCreate = (props) => {
-  const renderInput = ({ input, label }) => {
+//When writing functional components with Redux Form you must move
+//the renderInput and onSubmit methods outside of the component.
+// *****************************************************
+// You must define the stateless function outside of your render()
+// method, or else it will be recreated on every render and will force the Field to
+// rerender because its component prop will be different.
+// If you are defining your stateless function inside of render()
+// it will not only be slower, but your input will lose focus
+// whenever the entire form component rerenders.
+//******************************************************
+const renderError = ({ error, touched }) => {
+  if (touched && error) {
     return (
-      <div className="field">
-        <label>{label}</label>
-        <input {...input} />
+      <div className="ui error message">
+        <div className="header">{error}</div>
       </div>
     );
-  };
+  }
+};
+const renderInput = ({ input, label, meta }) => {
+  const className = `field ${meta.error && meta.touched ? 'error' : ''}`;
+  return (
+    <div className={className}>
+      <label>{label}</label>
+      <input {...input} autoComplete="off" />
+      {renderError(meta)}
+    </div>
+  );
+};
 
+const StreamCreate = (props) => {
   const onSubmit = (formValues) => {
-    console.log(formValues);
+    props.createStream(formValues);
   };
 
   return (
-    <form onSubmit={props.handleSubmit(onSubmit)} className="ui form">
+    <form onSubmit={props.handleSubmit(onSubmit)} className="ui form error">
       <Field name="title" component={renderInput} label="Enter Title" />
       <Field
         name="description"
@@ -33,26 +56,20 @@ const StreamCreate = (props) => {
   );
 };
 
-export default reduxForm({
+const validate = (formValues) => {
+  const errors = {};
+  if (!formValues.title) {
+    errors.title = 'You must enter a title';
+  }
+  if (!formValues.description) {
+    errors.description = 'You must enter a description';
+  }
+  return errors;
+};
+
+const formWrapped = reduxForm({
   form: 'streamCreate',
+  validate,
 })(StreamCreate);
 
-// import React from 'react';
-// import { Field, reduxForm } from 'redux-form';
-// class StreamCreate extends React.Component {
-//   renderInput(formProps) {
-//     return <input {...formProps.input} />;
-//   }
-
-//   render() {
-//     return (
-//       <form>
-//         <Field name="title" component={this.renderInput} />
-//         <Field name="description" component={this.renderInput} />
-//       </form>
-//     );
-//   }
-// }
-// export default reduxForm({
-//   form: 'sreamCreate',
-// })(StreamCreate);
+export default connect(null, { createStream })(formWrapped);
