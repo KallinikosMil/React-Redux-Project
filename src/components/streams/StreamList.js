@@ -1,5 +1,6 @@
+import _ from 'lodash';
 import React, { useEffect } from 'react';
-import { connect } from 'react-redux';
+import { connect, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { fetchStreams } from '../../actions';
 
@@ -25,9 +26,10 @@ const StreamList = (props) => {
       );
     }
   };
+  const streams = useSelector((state) => _.values(state.streams));
 
   const renderList = () => {
-    return props.streams.map((stream) => {
+    return streams.map((stream) => {
       return (
         <div className="item" key={stream.id}>
           {renderAdmin(stream)}
